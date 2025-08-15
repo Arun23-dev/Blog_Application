@@ -47,12 +47,13 @@ const postSchema=new Schema({
         required:true,
     },
     comment:[{
-        type:Schema.Types.ObjectId,
-        ref:"Comment",    
-    }]
-
-
-    
+        person:{type:Schema.Types.ObjectId,ref:"Comment"},
+        likes:{types:Schema.Types.ObjectId,ref:"User"}
+    }],
+    likes:{
+        type:Number,
+        default:0,
+    }  
 },
 { timestamps: true });
 const Post=mongoose.model('Post',postSchema);
