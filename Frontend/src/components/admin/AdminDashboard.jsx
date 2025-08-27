@@ -7,12 +7,12 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } fro
 
 // Mock data for the chart
 const chartData = [
-  { day: "1", views: 2400 },
-  { day: "5", views: 3200 },
+  { day: "2", views: 2200 },
+  { day: "5", views: 3500 },
   { day: "10", views: 4100 },
   { day: "15", views: 3800 },
   { day: "20", views: 4500 },
-  { day: "25", views: 5200 },
+  { day: "25", views: 4500 },
   { day: "30", views: 6000 },
 ]
 

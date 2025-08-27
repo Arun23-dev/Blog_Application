@@ -13,6 +13,9 @@ const {
   getCommentCountByPost,
   getCommentCountAll,
   getCommentCountByUser,
+  approveComment,
+  getRecentComment
+
 } = require("../controllers/commentController");
 
 commentRouter.post("/createComment", userMiddleware, createComment);
@@ -25,5 +28,7 @@ commentRouter.get("/getCommentByUser/:id", adminMiddleware, getCommentByUser);
 commentRouter.get("/getCommentCountByPost/:id", getCommentCountByPost);
 commentRouter.get("/getCommentCountAll", adminMiddleware, getCommentCountAll);
 commentRouter.get("/getCommentCountByUser/:id", adminMiddleware, getCommentCountByUser);
+commentRouter.patch("/approveComment/:id",adminMiddleware,approveComment)
+commentRouter.get("/getRecentComment",getRecentComment);
 
 module.exports = commentRouter;

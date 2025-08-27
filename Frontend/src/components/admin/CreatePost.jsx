@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,11 +56,11 @@ export default function CreatePostForm() {
             Sign Out
           </Link>
         </div>
-      </div> */}
+      </div>  */}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
+       {/* Header */}
         <div className="bg-white border-b border-gray-200 px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

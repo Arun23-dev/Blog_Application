@@ -1,3 +1,4 @@
+const mongoose=require("mongoose");
 const {Schema}=require("mongoose");
 const postSchema=new Schema({
     coverImg:{
@@ -8,15 +9,16 @@ const postSchema=new Schema({
         type:String,
         required:true,
         minlength:4,
-        maxlength:50,
+        maxlength:70,
     },
     slug:{
         type:String,
         required:true,
-        uniqu:true,
+        unique:true,
     },
     category:{
         type:String,
+        enum:["development","political","finance","ecomonic","raw thought"],
     },
     shortDesc:{
         type:String,
@@ -44,16 +46,8 @@ const postSchema=new Schema({
     user:{
         type:Schema.Types.ObjectId,
         ref:"User",
-        required:true,
+        required:false,
     },
-    comment:[{
-        person:{type:Schema.Types.ObjectId,ref:"Comment"},
-        likes:{types:Schema.Types.ObjectId,ref:"User"}
-    }],
-    likes:{
-        type:Number,
-        default:0,
-    }  
 },
 { timestamps: true });
 const Post=mongoose.model('Post',postSchema);

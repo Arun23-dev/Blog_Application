@@ -1,13 +1,14 @@
 const  Validator = require('validator');
 const validate=(data)=>{
 
+
     const mandatoryField=['firstName','emailId', 'password'];
     const isAllowed=mandatoryField.every((k)=>Object.keys(data).includes(k));
 
     if(!isAllowed){
         throw new Error("Field missing");
     }
-    if(!Validator.isEmail(data.emailId)){
+    if(!Validator.isEmail(!data.emailId.endsWith('@gmail.com'))){
         throw new Error("Invalid email");
     }
     if(!Validator.isLength(data.firstName,{min:3,max:20}))

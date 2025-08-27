@@ -1,5 +1,5 @@
-const { default: mongoose } = require("mongoose");
 const Post = require("../models/post");
+const User=require("../models/user")
 const validateReq = require("../utils/validatePost");
 
 const createPost = async (req, res) => {
@@ -30,10 +30,13 @@ const createPost = async (req, res) => {
     });
   }
 };
-// delete post by id
 const deletePost = async (req, res) => {
   try {
     const postId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      return res.status(400).json({ message: "Invalid Post ID" });
+    }
     const deletePost = await Post.findByIdAndDelete(postId);
 
     if (!deletePost) {
@@ -68,7 +71,6 @@ const getAllPost = async (req, res) => {
     });
   }
 };
-// get post by id
 const getPostById = async (req, res) => {
   try {
     const postId = req.params.id;
@@ -84,7 +86,6 @@ const getPostById = async (req, res) => {
     return res.status(404).send("Error occurs while fetching post", err);
   }
 };
-// updatPostById
 const updatePostById = async (req, res) => {
   try {
     const postId = req.params.id;
@@ -103,156 +104,164 @@ const updatePostById = async (req, res) => {
     });
   }
 };
-// getAllLikes
-const getAllLikes = async (req, res) => {
-  try {
-    const likesCount = await Post.aggregate([
-      { $match: { likes: { $gt: 0 } } }, // ignore posts with 0 likes
-      {
-        $group: {
-          _id: null,
-          totalLikes: { $sum: "$likes" },
-        },
-      },
-    ]);
-
-    res.status(200).json(likesCount[0].totalLikes); // returns [{ _id: null, totalLikes: X }]
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error counting likes", error: err.message });
-  }
-};
-// get likes by id
-const getLikesById = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const post = await Post.findById(id);
-
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    // Only return likes if greater than 0
-    const likes = post.likes > 0 ? post.likes : 0;
-
-    res.status(200).json({ postId: id, likes });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error fetching likes", error: err.message });
-  }
-};
-const getLikesEveryPost = async (req, res) => {
-  try {
-    const likesCount = await Post.aggregate([
-      { $project: { _id: 1, likes: 1, title: 1 } },
-    ]);
-    console.log(likesCount);
-
-    res.status(200).json(likesCount); // returns [{ _id: null, totalLikes: X }]
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error counting likes", error: err.message });
-  }
-};
-
-const getHighestLikedPost=async(req,res)=>{
-    
-       try {
-            const likesCount = await Post.aggregate([
-            { $project: { _id: 1, likes: 1, title: 1 } },
-            
-            {$sort:{likes:-1}},
-            ]);
-           
-            res.status(200).json(likesCount); // returns [{ _id: null, totalLikes: X }]
-          } catch (err) {
-            res
-            .status(500)
-            .json({ message: "Error counting likes", error: err.message });
-        }
-   
-}
-
 const getPostCount = async (req, res) => {
   try {
     const postCount = await Post.aggregate([
       {
         $group: {
           _id: null,
-          countPost: { $sum: 1 } // count each post
-        }
-      }
+          countPost: { $sum: 1 }, // count each post
+        },
+      },
     ]);
 
     res.status(200).json({
-      totalPosts: postCount[0]?.countPost || 0
+      totalPosts: postCount[0]?.countPost || 0,
     });
   } catch (err) {
     res.status(500).send("Error occurred here");
   }
 };
-
- const getPostByStatus=async(req,res)=>{
-   
+const getPostByStatus = async (req, res) => {
   try {
-    let { status } = req.query;  // gets ?status=published from URL
-    status=status.trim();
+    let { status } = req.query; // gets ?status=published from URL
+    status = status.trim();
     console.log(status);
     if (!status) {
       return res.status(400).json({ message: "Status query is required" });
     }
 
     const posts = await Post.aggregate([
-        { $match:{status:status}},
-        {
-            $project:{title:1,status:1}
-        }
-    ]);  // fetch posts with that status
+      { $match: { status: status } },
+      {
+        $project: { title: 1, status: 1 },
+      },
+    ]); // fetch posts with that status
     res.status(200).json(posts);
   } catch (err) {
-    res.status(500).json({ message: "Error fetching posts", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching posts", error: err.message });
   }
 };
-
-const getPostOrderByStatus=async(req,res)=>{
-
+const getPostOrderByStatus = async (req, res) => {
   try {
     const posts = await Post.find({}, { title: 1, status: 1 }) // select only title and status
-                             .sort({ status: 1 }); // sort by status ascending
+      .sort({ status: 1 }); // sort by status ascending
 
     res.status(200).json(posts);
   } catch (err) {
-    res.status(500).json({ message: "Error fetching posts", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching posts", error: err.message });
+  }
+};
+const getPostbyCategory = async (req, res) => {
+  try {
+    const { category } = req.query;
+    const data = await Post.find({ category: category });
+
+    if (data.length === 0) {
+      return res.status(404).send("Data with your category is empty");
+    }
+    return res.status(200).json({
+      data: data,
+      messagae: "data fetched successfully ok done",
+    });
+  } catch (err) {
+    return res.status(400).send("Error occurred ", err);
+  }
+};
+const getFeaturedPost = async (req, res) => {
+  try {
+    const data = await Post.find({ isFeatured: true });
+
+    if (data.length === 0) {
+      return res.status(404).send("Data with your category is empty");
+    }
+    return res.status(200).json({
+      data: data,
+      messagae: "data fetched successfully ok done",
+    });
+  } catch (err) {
+    return res.status(400).send("Error occurred ", err);
+  }
+};
+const getTotalVisitCount = async (req, res) => {
+  try {
+     const data=await Post.aggregate([
+      {$match:{visitNo:{$gt:0}}},
+      {$group:{
+        _id:null,
+      totalCount:{$sum:"$visitNo"}
+    }
+      }
+     ])
+     const totalVisits = data[0]?.totalCount || 0;
+    return res.status(200).json({ totalVisits });
+  } catch (err) {
+    return res.status(400).send("Error occurred ", err);
+  }
+};
+const getTotalVistPerPost = async (req, res) => {
+  try {
+    const data = await Post.find({}, { title: 1, visitNo: 1 });
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: "No posts found" });
+    }
+
+    return res.status(200).json({
+      message: "Visit count per post fetched successfully",
+      visitsPerPost: data
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Error occurred while fetching visit counts",
+      error: err.message
+    });
+  }
+};
+const getSavedPost = async (req, res) => {
+  try {
+    const userId = req.user._id; // assuming userMiddleware sets req.user
+
+    const user = await User.findById(userId).populate({
+      path: "savedPost",
+      select: "title slug coverImg visitNo" // pick only needed fields
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      savedPost: user.savedPost,
+      message: "Saved posts fetched successfully"
+    });
+
+  } 
+  catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "Error fetching saved posts",
+      error: err.message
+    });
   }
 };
 
-// const getPostbyCategory=async(req,res)=>{
-
-// }
-// const getFeaturedPost=async(req,res)=>{
-
-// }
-// const getTotalVisitCount=async (req,res)=>{
-
-// }
-// const getTotalVistPerPost=async(req,res)=>{
-
-// }
 module.exports = {
   createPost,
   deletePost,
   getAllPost,
   getPostById,
   updatePostById,
-  getAllLikes,
-  getLikesById,
-  getLikesEveryPost,
-  getHighestLikedPost,
   getPostCount,
   getPostByStatus,
   getPostOrderByStatus,
-  
+  getPostbyCategory,
+  getFeaturedPost,
+  getTotalVisitCount,
+  getTotalVistPerPost,
+  getSavedPost,
 };

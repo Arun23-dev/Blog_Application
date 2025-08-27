@@ -44,7 +44,7 @@ const mockUsers = [
   },
 ]
 
-export default function UsersManagement() {
+export default function UserDashboard() {
   const [searchTerm, setSearchTerm] = useState("")
   const [roleFilter, setRoleFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")

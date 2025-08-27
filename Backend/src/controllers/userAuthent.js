@@ -9,11 +9,9 @@ const user = require("../models/user");
 const register = async (req, res) => {
   try {
     
-
     validate(req.body); //function call for the validation
 
     const { firstName, emailId, password } = req.body; //destructuring of the object
-
     const saltRounds = 5;
 
     req.body.password = await bcrypt.hash(password, saltRounds);

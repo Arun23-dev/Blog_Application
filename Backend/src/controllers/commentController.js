@@ -170,8 +170,48 @@ const getCommentCountByUser=async(req,res)=>{
         return res.status(404).send("Can't able to fetch  the comment")
     }
 }
+const approveComment=async(req,res)=>{
+    try{
 
+        const commentId=req.params.id;
+        const approve=await Comment.updateOne(commentId,{approved:true},{new:true})
+        console.log(approve);
+        return res.status(200).json({
+            data:approve,
+            message:"comment approved successfully"
+        })
 
+    }
+    catch(err){
+        return res.status(404).send("error in approving",err.message);
+
+    }
+}
+const getRecentComment = async (req, res) => {
+  try {
+    // Optional: limit number of comments, default 10
+    const limit = parseInt(req.query.limit) || 10;
+
+    const recentComments = await Comment.find()
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate("user", "username email")   // populate user info
+      .populate("post", "title slug");      // populate post info
+
+    if (!recentComments || recentComments.length === 0) {
+      return res.status(404).json({ message: "No comments found" });
+    }
+
+    return res.status(200).json({
+      message: "Recent comments fetched successfully",
+      data: recentComments
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+}
 module.exports={
     createComment,
     deleteComment,
@@ -182,63 +222,20 @@ module.exports={
     getCommentByUser,
     getCommentCountByPost,
     getCommentCountAll,
-    getCommentCountByUser
-
+    getCommentCountByUser,
+    approveComment,
+    getRecentComment,
+    
 }
 
-// 🔹 1. Approve/Moderate Comment
-
-// Since you have an approved field, an endpoint to approve or reject comments would be useful:
-
-// PATCH /approveComment/:id
 
 
-// Controller could set approved: true or false. Useful for admin moderation.
-
-// 🔹 2. Like/Unlike Comment
-
-// You have likes as an array of user IDs. You could add endpoints to like or unlike a comment:
-
-// POST /likeComment/:id   -> add current user to likes array
-// POST /unlikeComment/:id -> remove current user from likes array
-
-// 🔹 3. Get comments with pagination
-
-// For posts with lots of comments, you can add query params:
-
-// GET /getCommentsByPost/:id?page=1&limit=10
 
 
-// This prevents sending all comments at once and improves performance.
-
-// 🔹 4. Get recent comments
-
-// An endpoint to get latest X comments across posts:
-
-// GET /getRecentComments?limit=10
-
-// 🔹 5. Reply to a comment (threaded comments)
-
-// You could extend your schema to allow nested comments:
-
-// replies: [{ type: Schema.Types.ObjectId, ref: "Comment" }]
 
 
-// Then add an endpoint:
 
-// POST /replyComment/:id
 
-// 🔹 6. Search comments
 
-// Allow searching comments by text:
-
-// GET /searchComments?query=someText
-
-// 🔹 7. Bulk approve/disapprove (for admin)
-
-// Approve or disapprove multiple comments at once:
-
-// PATCH /approveComments
-// Body: { commentIds: [id1, id2], approved: true }
 
 

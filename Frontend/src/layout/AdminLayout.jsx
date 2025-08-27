@@ -1,18 +1,18 @@
 
 import { LayoutDashboard, FileText, Video, ImageIcon, Users, Settings, LogOut } from "lucide-react"
-import { Link } from "react-router";
+import { Link, Outlet } from "react-router";
 import { Button } from "@/components/ui/button"
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin", active: true },
   { icon: FileText, label: "Blog Posts", href: "/admin/posts" },
-  { icon: Video, label: "Videos", href: "/admin/videos" },
+  // { icon: Video, label: "Videos", href: "/admin/videos" },
   { icon: ImageIcon, label: "Media Library", href: "/admin/media" },
   { icon: Users, label: "Users", href: "/admin/users" },
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ]
 
-export default function AdminLayout({ children }) {
+export default function AdminLayout() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
@@ -27,7 +27,7 @@ export default function AdminLayout({ children }) {
           {sidebarItems.map((item) => {
             const Icon = item.icon
             return (
-              <Link key={item.href} href={item.href}>
+              <Link key={item.href} to={item.href}>
                 <div
                   className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     item.active
@@ -55,8 +55,12 @@ export default function AdminLayout({ children }) {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1">{children}</div>
+     
+   {/* Main Content */}
+    <div className="flex-1 p-6">
+      <Outlet />
+    </div>
+
     </div>
   )
 }

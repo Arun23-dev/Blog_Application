@@ -1,11 +1,13 @@
-import React from 'react'
-import Navbar from '../components/Navbar'
+
+import Navbar from '../components/user/Navbar'
 import { Outlet } from 'react-router'
+import Footer from '../components/user/Footer'
 function Mainlayout() {
   return (
-    <div className='px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64'>
+    <div className='sm:px-4 md:px-8 lg:px-16 xl:px-32 '>
       <Navbar></Navbar>
       <Outlet></Outlet>
+     
     </div>
   )
 }
