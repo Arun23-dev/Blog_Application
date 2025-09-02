@@ -1,19 +1,19 @@
-import { Routes, Route } from "react-router"
-import AdminLayout from "@/layout/AdminLayout"
-import AdminDashboard from "@/components/admin/AdminDashboard"
-import BlogPost from "@/components/admin/BlogPost"
-import UserDashboard from "@/components/admin/UserDashboard"
-import SettingAdmin from "@/components/admin/SettingAdmin"
+import { useSelector } from 'react-redux';
+import { Navigate, Outlet } from 'react-router';
 
-export default function AdminRoutes() {
-  return (
-    <Routes>
-      <Route path="/" element={<AdminLayout />}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="posts" element={<BlogPost />} />
-        <Route path="users" element={<UserDashboard />} />
-        <Route path="settings" element={<SettingAdmin/>} />
-      </Route>
-    </Routes>
-  )
-}
+const AdminRoute = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+
+  // Check if user is authenticated and has admin role
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+};
+
+export default AdminRoute;

@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router";
-import Comments from "../components/user/Comments";
+import Comments from "../components/Comments";
 import { Image } from '@imagekit/react'
 
 

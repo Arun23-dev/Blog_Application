@@ -13,7 +13,6 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
@@ -50,15 +49,53 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
+// Auth0 integration actions
+export const setAuth0User = createAsyncThunk(
+  'auth/setAuth0User',
+  async (auth0User, { rejectWithValue }) => {
+    try {
+      // If user exists in our database, return it
+      // If not, create a new user with Auth0 data
+      const response = await axiosClient.post('/user/auth0-login', {
+        emailId: auth0User.email,
+        firstName: auth0User.given_name || auth0User.name?.split(' ')[0] || 'User',
+        lastName: auth0User.family_name || auth0User.name?.split(' ').slice(1).join(' ') || '',
+        auth0Id: auth0User.sub,
+        picture: auth0User.picture
+      });
+      return response.data.user;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const clearAuth0User = createAsyncThunk(
+  'auth/clearAuth0User',
+  async (_, { rejectWithValue }) => {
+    try {
+      await axiosClient.post('/user/logout');
+      return null;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
     isAuthenticated: false,
     loading: false,
-    error: null
+    error: null,
+    auth0User: null,
+    isAuth0Authenticated: false
   },
   reducers: {
+    clearError: (state) => {
+      state.error = null;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -129,8 +166,49 @@ const authSlice = createSlice({
         state.error = action.payload?.message || 'Something went wrong';
         state.isAuthenticated = false;
         state.user = null;
+      })
+
+      // Auth0 Cases
+      .addCase(setAuth0User.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(setAuth0User.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = !!action.payload;
+        state.isAuth0Authenticated = true;
+        state.user = action.payload;
+      })
+      .addCase(setAuth0User.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Auth0 login failed';
+        state.isAuthenticated = false;
+        state.isAuth0Authenticated = false;
+        state.user = null;
+      })
+
+      .addCase(clearAuth0User.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(clearAuth0User.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.isAuth0Authenticated = false;
+        state.auth0User = null;
+        state.error = null;
+      })
+      .addCase(clearAuth0User.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Auth0 logout failed';
+        state.isAuthenticated = false;
+        state.isAuth0Authenticated = false;
+        state.user = null;
+        state.auth0User = null;
       });
   }
 });
 
+export const { clearError } = authSlice.actions;
 export default authSlice.reducer;
