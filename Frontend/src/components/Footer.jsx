@@ -1,132 +1,101 @@
-import { PenTool, Twitter, Facebook, Instagram, Linkedin, Heart } from "lucide-react"
+import React from "react";
+import { Github, Twitter, Linkedin, Youtube, Instagram, Mail } from "lucide-react";
+
+const footerLinks = {
+  Company: [
+    { name: "About", href: "#" },
+    { name: "Careers", href: "#" },
+    { name: "Contact", href: "#" },
+    { name: "Press", href: "#" },
+  ],
+  Content: [
+    { name: "Latest Blogs", href: "#" },
+    { name: "Video Interviews", href: "#" },
+    { name: "Categories", href: "#" },
+    { name: "Featured", href: "#" },
+  ],
+  Resources: [
+    { name: "Help Center", href: "#" },
+    { name: "Community", href: "#" },
+    { name: "Guidelines", href: "#" },
+    { name: "API", href: "#" },
+  ],
+  Legal: [
+    { name: "Privacy Policy", href: "#" },
+    { name: "Terms of Service", href: "#" },
+    { name: "Cookie Policy", href: "#" },
+    { name: "GDPR", href: "#" },
+  ],
+};
+
+const socialLinks = [
+  { name: "Twitter", icon: Twitter, href: "#" },
+  { name: "LinkedIn", icon: Linkedin, href: "#" },
+  { name: "YouTube", icon: Youtube, href: "#" },
+  { name: "Instagram", icon: Instagram, href: "#" },
+  { name: "GitHub", icon: Github, href: "#" },
+  { name: "Email", icon: Mail, href: "#" },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-white py-16">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Main footer content */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-          {/* Brand  section */}
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-indigo-600 p-2 rounded-lg">
-                <PenTool className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold">ModernBlog</h3>
+    <footer className="bg-card dark:bg-background text-card-foreground dark:text-foreground">
+      <div className="container px-4 py-16">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-6">
+          {/* Brand Section */}
+          <div className="lg:col-span-2">
+            <div className="mb-4 flex items-center space-x-2">
+              <div className="h-8 w-8 rounded-lg bg-primary dark:bg-secondary"></div>
+              <span className="font-montserrat text-xl font-bold">BlogHub</span>
             </div>
-            <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
-              Insights, stories, and tips for modern living. Where creativity meets innovation to inspire and empower
-              readers worldwide.
+            <p className="mb-6 text-muted-foreground dark:text-muted-foreground max-w-md">
+              Discover curated content, exclusive interviews, and AI-powered insights. 
+              Your gateway to knowledge and inspiration.
             </p>
-            {/* Social media icons - left side */}
-            <div className="flex gap-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
+            <div className="flex space-x-4">
+              {socialLinks.map((social) => {
+                const IconComponent = social.icon;
+                return (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted dark:bg-muted-foreground text-muted-foreground dark:text-muted transition-colors hover:bg-primary hover:text-primary-foreground"
+                    aria-label={social.name}
+                  >
+                    <IconComponent className="h-5 w-5" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
-          {/* Categories section */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Categories</h4>
-            <ul className="space-y-3">
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Technology
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Travel
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Lifestyle
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Career
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Wellness
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company section */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Company</h4>
-            <ul className="space-y-3">
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Our Team
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Contact
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Terms of Service
-                </a>
-              </li>
-            </ul>
-          </div>
+          {/* Links Sections */}
+          {Object.entries(footerLinks).map(([category, links]) => (
+            <div key={category}>
+              <h3 className="mb-4 font-montserrat text-lg font-semibold">{category}</h3>
+              <ul className="space-y-2">
+                {links.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      className="text-muted-foreground dark:text-muted hover:text-primary dark:hover:text-primary-foreground transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        {/* Bottom section */}
-        <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-400 text-sm">© 2024 ModernBlog. All rights reserved.</p>
-
-          <div className="flex items-center gap-6">
-            {/* Right side tagline */}
-            <div className="flex items-center gap-2 text-gray-400 text-sm">
-              <Heart className="w-4 h-4 text-red-500 fill-current" />
-              <span>Made with love</span>
-              <span>•</span>
-              <span>Powered by creativity</span>
-            </div>
-
-            <div className="flex gap-3">
-              <a href="#" className="text-gray-400 hover:text-indigo-400 transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-pink-400 transition-colors">
-                <Instagram className="w-5 h-5" />
-              </a>
-            </div>
+        <div className="mt-12 border-t border-border dark:border-muted pt-8">
+          <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
+            <p className="text-muted-foreground dark:text-muted">© 2024 BlogHub. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground dark:text-muted">Powered by our custom CMS & AI insights</p>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Blog CMS</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4cb5f5;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .tab {
+            padding: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .tab.active {
+            background: white;
+            border-bottom: 2px solid var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 2rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .editor, .preview {
+            min-height: 500px;
+        }
+        
+        .block-controls {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            transition: background 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .content-blocks {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            min-height: 300px;
+            padding: 1rem;
+        }
+        
+        .block {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: #f8f9fa;
+            position: relative;
+        }
+        
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .block-type {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .block-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6c757d;
+            margin-left: 0.5rem;
+        }
+        
+        .block-actions button:hover {
+            color: var(--dark-color);
+        }
+        
+        .block-content {
+            margin-top: 0.5rem;
+        }
+        
+        textarea, input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .preview-content {
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+        }
+        
+        .blog-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+        }
+        
+        .text-block {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+        
+        .image-block {
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        
+        .image-block img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        
+        .image-caption {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        
+        .video-block {
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 4px;
+        }
+        
+        .video-caption {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .block-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .block-actions {
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Custom Blog CMS</h1>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="editor">Editor</div>
+            <div class="tab" data-tab="preview">Preview</div>
+        </div>
+        
+        <div class="tab-content active" id="editor">
+            <div class="editor">
+                <div class="block-controls">
+                    <h3>Add Content Blocks</h3>
+                    <button class="btn btn-primary" id="add-text">Add Text Block</button>
+                    <button class="btn btn-primary" id="add-image">Add Image Block</button>
+                    <button class="btn btn-primary" id="add-video">Add Video Block</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="blog-title">Blog Title</label>
+                    <input type="text" id="blog-title" placeholder="Enter blog title">
+                </div>
+                
+                <div class="content-blocks" id="content-blocks">
+                    <!-- Blocks will be added here dynamically -->
+                </div>
+                
+                <div class="actions" style="margin-top: 1rem;">
+                    <button class="btn btn-success" id="save-blog">Save Blog</button>
+                    <button class="btn btn-danger" id="reset-blog">Reset</button>
+                </div>
+                
+                <div class="alert alert-success" id="save-alert">
+                    Blog saved successfully!
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="preview">
+            <div class="preview">
+                <h2>Blog Preview</h2>
+                <div class="preview-content" id="blog-preview">
+                    <!-- Preview content will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show active content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId) {
+                            content.classList.add('active');
+                        }
+                    });
+                    
+                    // If switching to preview, generate it
+                    if (tabId === 'preview') {
+                        generatePreview();
+                    }
+                });
+            });
+            
+            // Add block functionality
+            document.getElementById('add-text').addEventListener('click', () => {
+                addBlock('text');
+            });
+            
+            document.getElementById('add-image').addEventListener('click', () => {
+                addBlock('image');
+            });
+            
+            document.getElementById('add-video').addEventListener('click', () => {
+                addBlock('video');
+            });
+            
+            // Save blog functionality
+            document.getElementById('save-blog').addEventListener('click', () => {
+                saveBlog();
+            });
+            
+            // Reset blog functionality
+            document.getElementById('reset-blog').addEventListener('click', () => {
+                if (confirm('Are you sure you want to reset? All content will be lost.')) {
+                    resetBlog();
+                }
+            });
+            
+            // Function to add a new content block
+            function addBlock(type) {
+                const blocksContainer = document.getElementById('content-blocks');
+                const blockId = Date.now(); // Unique ID based on timestamp
+                
+                let blockHTML = '';
+                
+                if (type === 'text') {
+                    blockHTML = `
+                        <div class="block" data-type="text" data-id="${blockId}">
+                            <div class="block-header">
+                                <span class="block-type">Text Block</span>
+                                <div class="block-actions">
+                                    <button class="move-up">↑</button>
+                                    <button class="move-down">↓</button>
+                                    <button class="delete-block">×</button>
+                                </div>
+                            </div>
+                            <div class="block-content">
+                                <textarea placeholder="Enter your text here..." rows="6"></textarea>
+                            </div>
+                        </div>
+                    `;
+                } else if (type === 'image') {
+                    blockHTML = `
+                        <div class="block" data-type="image" data-id="${blockId}">
+                            <div class="block-header">
+                                <span class="block-type">Image Block</span>
+                                <div class="block-actions">
+                                    <button class="move-up">↑</button>
+                                    <button class="move-down">↓</button>
+                                    <button class="delete-block">×</button>
+                                </div>
+                            </div>
+                            <div class="block-content">
+                                <input type="url" placeholder="Enter image URL">
+                                <input type="text" placeholder="Caption (optional)">
+                            </div>
+                        </div>
+                    `;
+                } else if (type === 'video') {
+                    blockHTML = `
+                        <div class="block" data-type="video" data-id="${blockId}">
+                            <div class="block-header">
+                                <span class="block-type">Video Block</span>
+                                <div class="block-actions">
+                                    <button class="move-up">↑</button>
+                                    <button class="move-down">↓</button>
+                                    <button class="delete-block">×</button>
+                                </div>
+                            </div>
+                            <div class="block-content">
+                                <input type="url" placeholder="Enter video URL (YouTube, Vimeo, etc.)">
+                                <input type="text" placeholder="Caption (optional)">
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                blocksContainer.insertAdjacentHTML('beforeend', blockHTML);
+                
+                // Add event listeners to the new block's buttons
+                const newBlock = blocksContainer.lastElementChild;
+                addBlockEventListeners(newBlock);
+            }
+            
+            // Function to add event listeners to a block
+            function addBlockEventListeners(block) {
+                block.querySelector('.move-up').addEventListener('click', () => {
+                    const prev = block.previousElementSibling;
+                    if (prev) {
+                        block.parentNode.insertBefore(block, prev);
+                    }
+                });
+                
+                block.querySelector('.move-down').addEventListener('click', () => {
+                    const next = block.nextElementSibling;
+                    if (next) {
+                        block.parentNode.insertBefore(next, block);
+                    }
+                });
+                
+                block.querySelector('.delete-block').addEventListener('click', () => {
+                    if (confirm('Delete this block?')) {
+                        block.remove();
+                    }
+                });
+            }
+            
+            // Function to generate the preview
+            function generatePreview() {
+                const title = document.getElementById('blog-title').value;
+                const blocks = document.querySelectorAll('.block');
+                const previewContainer = document.getElementById('blog-preview');
+                
+                let previewHTML = `<h1 class="blog-title">${title || 'Untitled Blog Post'}</h1>`;
+                
+                blocks.forEach(block => {
+                    const type = block.getAttribute('data-type');
+                    
+                    if (type === 'text') {
+                        const text = block.querySelector('textarea').value;
+                        previewHTML += `<div class="text-block">${text.replace(/\n/g, '<br>')}</div>`;
+                    } else if (type === 'image') {
+                        const url = block.querySelector('input[type="url"]').value;
+                        const caption = block.querySelector('input[type="text"]').value;
+                        
+                        if (url) {
+                            previewHTML += `
+                                <div class="image-block">
+                                    <img src="${url}" alt="${caption || 'Blog image'}">
+                                    ${caption ? `<div class="image-caption">${caption}</div>` : ''}
+                                </div>
+                            `;
+                        }
+                    } else if (type === 'video') {
+                        const url = block.querySelector('input[type="url"]').value;
+                        const caption = block.querySelector('input[type="text"]').value;
+                        
+                        if (url) {
+                            // Simple YouTube embed detection
+                            let embedUrl = url;
+                            if (url.includes('youtube.com/watch?v=')) {
+                                const videoId = url.split('v=')[1];
+                                const ampersandPosition = videoId.indexOf('&');
+                                if (ampersandPosition !== -1) {
+                                    embedUrl = `https://www.youtube.com/embed/${videoId.substring(0, ampersandPosition)}`;
+                                } else {
+                                    embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                                }
+                            } else if (url.includes('youtu.be/')) {
+                                const videoId = url.split('youtu.be/')[1];
+                                embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                            }
+                            
+                            previewHTML += `
+                                <div class="video-block">
+                                    <div class="video-container">
+                                        <iframe src="${embedUrl}" allowfullscreen></iframe>
+                                    </div>
+                                    ${caption ? `<div class="video-caption">${caption}</div>` : ''}
+                                </div>
+                            `;
+                        }
+                    }
+                });
+                
+                previewContainer.innerHTML = previewHTML;
+            }
+            
+            // Function to save the blog
+            function saveBlog() {
+                const title = document.getElementById('blog-title').value;
+                const blocks = document.querySelectorAll('.block');
+                
+                const blogData = {
+                    title: title,
+                    content: []
+                };
+                
+                blocks.forEach(block => {
+                    const type = block.getAttribute('data-type');
+                    const blockData = {
+                        type: type
+                    };
+                    
+                    if (type === 'text') {
+                        blockData.text = block.querySelector('textarea').value;
+                    } else if (type === 'image') {
+                        blockData.url = block.querySelector('input[type="url"]').value;
+                        blockData.caption = block.querySelector('input[type="text"]').value;
+                    } else if (type === 'video') {
+                        blockData.url = block.querySelector('input[type="url"]').value;
+                        blockData.caption = block.querySelector('input[type="text"]').value;
+                    }
+                    
+                    blogData.content.push(blockData);
+                });
+                
+                // In a real application, you would send this data to a server
+                // For this demo, we'll just store it in localStorage
+                localStorage.setItem('blogData', JSON.stringify(blogData));
+                
+                // Show success message
+                const alert = document.getElementById('save-alert');
+                alert.style.display = 'block';
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+                
+                console.log('Blog saved:', blogData);
+            }
+            
+            // Function to reset the blog
+            function resetBlog() {
+                document.getElementById('blog-title').value = '';
+                document.getElementById('content-blocks').innerHTML = '';
+            }
+            
+            // Load saved blog if exists
+            function loadBlog() {
+                const savedBlog = localStorage.getItem('blogData');
+                if (savedBlog) {
+                    const blogData = JSON.parse(savedBlog);
+                    
+                    document.getElementById('blog-title').value = blogData.title;
+                    
+                    blogData.content.forEach(blockData => {
+                        addBlock(blockData.type);
+                        
+                        const blocks = document.querySelectorAll('.block');
+                        const newBlock = blocks[blocks.length - 1];
+                        
+                        if (blockData.type === 'text') {
+                            newBlock.querySelector('textarea').value = blockData.text;
+                        } else if (blockData.type === 'image') {
+                            newBlock.querySelector('input[type="url"]').value = blockData.url;
+                            newBlock.querySelector('input[type="text"]').value = blockData.caption;
+                        } else if (blockData.type === 'video') {
+                            newBlock.querySelector('input[type="url"]').value = blockData.url;
+                            newBlock.querySelector('input[type="text"]').value = blockData.caption;
+                        }
+                    });
+                }
+            }
+            
+            // Initialize
+            loadBlog();
+        });
+    </script>
+</body>
+</html>

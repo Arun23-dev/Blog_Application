@@ -1,130 +1,121 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router";
-import { useEffect } from "react";
-import { loginUser } from "../../authSlice";
-import { useAuth0 } from '@auth0/auth0-react';
+import React, { useState } from "react";
 
-const loginSchema = z.object({
-  emailId: z.string().email("Invalid Email"),
-  password: z.string().min(1, "Password is required"),
-});
+const SignupForm = () => {
+  // State for form fields
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    termsAccepted: false,
+  });
 
-function Login() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { user, isAuthenticated, loading, error } = useSelector(
-    (state) => state.auth
-  );
-  const { loginWithRedirect } = useAuth0();
+  // State for form errors
+  const [errors, setErrors] = useState({});
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({ resolver: zodResolver(loginSchema) });
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Redirect admin users to admin panel, regular users to home
-      if (user?.role === 'admin') {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
-    }
-  }, [isAuthenticated, navigate, user]);
-
-  const onSubmit = (data) => {
-    dispatch(loginUser(data));
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
   };
 
-  const handleAuth0Login = () => {
-    loginWithRedirect();
+  // Basic form validation
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.password) newErrors.password = "Password is required";
+    if (!formData.confirmPassword) newErrors.confirmPassword = "Confirm password is required";
+    if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    if (!formData.termsAccepted) newErrors.termsAccepted = "You must agree to the terms";
+    return newErrors;
+  };
+
+  // Handle form submit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formErrors = validateForm();
+    setErrors(formErrors);
+
+    if (Object.keys(formErrors).length === 0) {
+      console.log("Form submitted successfully:", formData);
+      // Reset form or handle API call here
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-      <div className="card w-96 bg-white shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title justify-center text-3xl mb-6">Login</h2>
-          
-          {error && (
-            <div className="alert alert-error mb-4">
-              <span>{error}</span>
-            </div>
-          )}
-          
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-control mt-4">
-              <label className="label mb-1">
-                <span className="label-text">Email</span>
-              </label>
-              <input
-                type="email"
-                placeholder="john@example.com"
-                className={`input input-bordered ${errors.emailId && "input-error"
-                  }`}
-                {...register("emailId")}
-              />
-              {errors.emailId && (
-                <span className="text-error text-sm mt-1">{errors.emailId.message}</span>
-              )}
-            </div>
+    <div className="signup-container max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <h1 className="text-2xl font-bold mb-2 text-center">Login</h1>
 
-            <div className="form-control mt-4">
-              <label className="label mb-1">
-                <span className="label-text">Password</span>
-              </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className={`input input-bordered ${errors.password && "input-error"
-                  }`}
-                {...register("password")}
-              />
-              {errors.password && (
-                <span className="text-error text-sm mt-1">{errors.password.message}</span>
-              )}
-            </div>
+      <form onSubmit={handleSubmit} noValidate>
+     
 
-            <div className="form-control mt-6">
-              <button 
-                type="submit" 
-                className={`btn btn-primary ${loading ? 'loading' : ''}`}
-                disabled={loading}
-              >
-                {loading ? 'Logging in...' : 'Login'}
-              </button>
-            </div>
-          </form>
-          
-          <div className="divider">OR</div>
-          
-          <button
-            type="button"
-            onClick={handleAuth0Login}
-            className="w-full py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors"
-          >
-            Login with Auth0
+      
+
+        {/* Email */}
+        <div className="mb-4">
+          <label htmlFor="email" className="block mb-1 font-medium">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`w-full border px-3 py-2 rounded ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+        </div>
+
+        {/* Password */}
+        <div className="mb-4">
+          <label htmlFor="password" className="block mb-1 font-medium">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            className={`w-full border px-3 py-2 rounded ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+        </div>
+
+       
+
+    
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+        >
+          Login
+        </button>
+      </form>
+
+      {/* Footer */}
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-500 mb-3">
+          Don't have  an account? <a href="/signup" className="text-blue-600 hover:underline">Create Account</a>
+        </p>
+        <div className="flex justify-center gap-4">
+          <button className="px-4 py-2 border rounded flex items-center gap-2 hover:bg-gray-100 transition">
+            <img src="/icons/google.svg" alt="Google" className="w-5 h-5" /> Google
           </button>
-          
-          <div className="divider">OR</div>
-          
-          <div className="text-center">
-            <p className="text-sm text-gray-600 mb-2">
-              Don't have an account?
-            </p>
-            <Link to="/signup" className="btn btn-outline btn-sm">
-              Sign Up
-            </Link>
-          </div>
+          <button className="px-4 py-2 border rounded flex items-center gap-2 hover:bg-gray-100 transition">
+            <img src="/icons/facebook.svg" alt="Facebook" className="w-5 h-5" /> Facebook
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default Login;
+export default SignupForm;

@@ -1,184 +1,158 @@
+import React, { useState } from "react";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useDispatch, useSelector } from 'react-redux';
-import { registerUser } from "../../authSlice";
-import { useNavigate, Link } from 'react-router';
-import { useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
-
-const strongPasswordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-const signupSchema = z
-  .object({
-    firstName: z.string().min(3, "First name must be at least 3 characters"),
-    email: z
-      .email("Invalid email address"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(
-        strongPasswordRegex,
-        "Password must include uppercase, lowercase, number, and special character"
-      ),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
+const SignupForm = () => {
+  // State for form fields
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    termsAccepted: false,
   });
 
-export default function SignUp() {
-   const dispatch = useDispatch();
-   const navigate = useNavigate();
-   const { user, isAuthenticated, loading, error } = useSelector((state) => state.auth);
-   const { loginWithRedirect, isAuthenticated: isAuth0Authenticated } = useAuth0();
+  // State for form errors
+  const [errors, setErrors] = useState({});
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({ resolver: zodResolver(signupSchema) });
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Redirect admin users to admin panel, regular users to home
-      if (user?.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
-    }
-  }, [isAuthenticated, navigate, user]);
-
-  const submittedData = (data) => {
-    const dispatchData = {
-      firstName: data.firstName,
-      emailId: data.email,
-      password: data.password
-    };
-    console.log(dispatchData);
-    dispatch(registerUser(dispatchData));
-  };
-
-  const handleAuth0SignUp = () => {
-    loginWithRedirect({
-      screen_hint: 'signup'
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
-  const handleAuth0Login = () => {
-    loginWithRedirect();
+  // Basic form validation
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.password) newErrors.password = "Password is required";
+    if (!formData.confirmPassword) newErrors.confirmPassword = "Confirm password is required";
+    if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    if (!formData.termsAccepted) newErrors.termsAccepted = "You must agree to the terms";
+    return newErrors;
+  };
+
+  // Handle form submit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formErrors = validateForm();
+    setErrors(formErrors);
+
+    if (Object.keys(formErrors).length === 0) {
+      console.log("Form submitted successfully:", formData);
+      // Reset form or handle API call here
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md space-y-4">
-        <h2 className="text-2xl font-bold text-center mb-4">Sign Up</h2>
-        
-        {error && (
-          <div className="alert alert-error mb-4">
-            <span>{error}</span>
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit(submittedData)} className="space-y-4">
-          <div>
-            <input
-              {...register("firstName")}
-              placeholder="Enter your first name"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.firstName ? "border-red-500" : "border-gray-300"
-              }`}
-            />
-            {errors.firstName && (
-              <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
-            )}
-          </div>
+    <div className="signup-container max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <h1 className="text-2xl font-bold mb-2 text-center">Create Account</h1>
+      <p className="text-center text-gray-500 mb-6">Join us today</p>
 
-          <div>
-            <input
-              {...register("email")}
-              placeholder="Enter your email"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              }`}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div>
-            <input
-              {...register("password")}
-              type="password"
-              placeholder="Enter your password"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              }`}
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-            )}
-          </div>
-
-          <div>
-            <input
-              {...register("confirmPassword")}
-              type="password"
-              placeholder="Confirm password"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.confirmPassword ? "border-red-500" : "border-gray-300"
-              }`}
-            />
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            className={`w-full py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={loading}
-          >
-            {loading ? 'Creating Account...' : 'Sign Up'}
-          </button>
-        </form>
-        
-        <div className="divider">OR</div>
-        
-        <div className="space-y-3">
-          <button
-            type="button"
-            onClick={handleAuth0SignUp}
-            className="w-full py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors"
-          >
-            Sign Up with Auth0
-          </button>
-
-          <button
-            type="button"
-            onClick={handleAuth0Login}
-            className="w-full py-2 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            Login with Auth0
-          </button>
+      <form onSubmit={handleSubmit} noValidate>
+        {/* Full Name */}
+        <div className="mb-4">
+          <label htmlFor="firstName" className="block mb-1 font-medium">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            className={`w-full border px-3 py-2 rounded ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
         </div>
-        
-        <div className="divider">OR</div>
-        
-        <div className="text-center">
-          <p className="text-sm text-gray-600 mb-2">
-            Already have an account?
-          </p>
-          <Link to="/login" className="btn btn-outline btn-sm">
-            Login
-          </Link>
+
+      
+
+        {/* Email */}
+        <div className="mb-4">
+          <label htmlFor="email" className="block mb-1 font-medium">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`w-full border px-3 py-2 rounded ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+        </div>
+
+        {/* Password */}
+        <div className="mb-4">
+          <label htmlFor="password" className="block mb-1 font-medium">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            className={`w-full border px-3 py-2 rounded ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+        </div>
+
+        {/* Confirm Password */}
+        <div className="mb-4">
+          <label htmlFor="confirmPassword" className="block mb-1 font-medium">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className={`w-full border px-3 py-2 rounded ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+        </div>
+
+        {/* Terms Checkbox */}
+        <div className="mb-4 flex items-center">
+          <input
+            type="checkbox"
+            id="termsAccepted"
+            name="termsAccepted"
+            checked={formData.termsAccepted}
+            onChange={handleChange}
+            className="mr-2"
+          />
+          <label htmlFor="termsAccepted" className="text-sm">I agree to the terms and policy</label>
+        </div>
+        {errors.termsAccepted && <p className="text-red-500 text-sm mb-4">{errors.termsAccepted}</p>}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+        >
+          Create Account
+        </button>
+      </form>
+
+      {/* Footer */}
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-500 mb-3">
+          Already have an account? <a href="/login" className="text-blue-600 hover:underline">Sign in</a>
+        </p>
+        <div className="flex justify-center gap-4">
+          <button className="px-4 py-2 border rounded flex items-center gap-2 hover:bg-gray-100 transition">
+            <img src="/icons/google.svg" alt="Google" className="w-5 h-5" /> Google
+          </button>
+          <button className="px-4 py-2 border rounded flex items-center gap-2 hover:bg-gray-100 transition">
+            <img src="/icons/facebook.svg" alt="Facebook" className="w-5 h-5" /> Facebook
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SignupForm;
