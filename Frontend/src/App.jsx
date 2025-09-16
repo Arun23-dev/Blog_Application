@@ -24,20 +24,16 @@ import Auth0Management from "./pages/admin/Auth0Management";
 import RateLimitManagement from "./pages/admin/RateLimitManagement";
 import AdminBlog from "./pages/admin/AdminBlog";
 import Blogs from "./pages/Blogs";
-import Blog from "./pages/Blog";
-
-
+// import Blog from "./pages/Blog";
 
 // routes
 import AdminRoute from "./routes/AdminRoute";
 
-// components
-import AuthProvider from "./components/AuthProvider";
+// import AuthProvider from "./components/AuthProvider";
 
 export default function App() {
   const imagekiturl = import.meta.env.VITE_IMAGEKIT_URL
   return (
-    <AuthProvider>
       <ImageKitProvider urlEndpoint={imagekiturl}>
         <Routes>
           <Route element={<PublicLayout />}>
@@ -51,7 +47,7 @@ export default function App() {
 
             
             <Route path="/blogs" element={<Blogs />} />
-            <Route path="/blogs/:id" element={<Blog />} />
+            {/* <Route path="/blogs/:id" element={<Blog />} /> */}
 
 
 
@@ -74,6 +70,5 @@ export default function App() {
           {/* </Route> */}
         </Routes>
       </ImageKitProvider>
-    </AuthProvider>
   );
 }

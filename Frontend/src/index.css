@@ -1,10 +1,9 @@
-/* ✅ All imports must stay at the very top, one after another */
+/* ✅ Imports must come first */
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;500;600&display=swap");
-
+/* then you can add your custom stuff */
 @custom-variant dark (&:is(.dark *));
 
-/* Light mode variables */
+/* ligth variables  */
 :root {
   --background: oklch(1 0 0); 
   --foreground: oklch(0.345 0 0); 
@@ -117,4 +116,4 @@
   .font-heading {
     font-family: var(--font-heading);
   }
-}
+} */
