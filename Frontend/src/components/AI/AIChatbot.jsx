@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles, AlertTriangle } from 'lucide-react';
-import axiosClient from '../../utils/axiosClient';
+import axiosClient from '../../../utils/axiosClient';
 import { useSelector } from 'react-redux';
 
 const AIChatbot = () => {

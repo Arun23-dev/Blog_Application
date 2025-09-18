@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search as SearchIcon, Filter, X } from 'lucide-react';
-import AISearch from './AISearch';
+import AISearch from './AI/AISearch';
 
 const Search = ({ onSearch, placeholder = "Search articles..." }) => {
   const [searchTerm, setSearchTerm] = useState('');

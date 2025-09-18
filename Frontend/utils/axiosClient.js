@@ -7,6 +7,4 @@ const axiosClient =  axios.create({
         'Content-Type': 'application/json'
     }
 });
-
-
 export default axiosClient;

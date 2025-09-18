@@ -58,3 +58,18 @@ export function DropdownMenuItem({ children, onClick, className = "" }) {
     </div>
   );
 }
+
+export function DropdownMenuSeparator({ className = "" }) {
+  const { isOpen } = useContext(DropdownMenuContext);
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className={`h-px bg-gray-200 my-1 ${className}`}
+      role="separator"
+      aria-orientation="horizontal"
+    />
+  );
+}
+

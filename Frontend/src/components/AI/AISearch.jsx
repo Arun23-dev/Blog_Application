@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Sparkles, Loader2, X, Bot, TrendingUp } from 'lucide-react';
-import axiosClient from '../../utils/axiosClient';
+import axiosClient from '../../../utils/axiosClient';
 
 
 const AISearch = ({ onSearchResults, placeholder = "Search with AI..." }) => {

@@ -17,12 +17,12 @@ app.use(cors({
   origin:"http://localhost:5173",
   credentials:true, 
 }));
-
+console.log("index hitted")
 app.use("/user", authRouter);
 app.use("/post",postRouter);
 app.use("/comment",commentRouter);
 // app.use("/like",likeRouter);
-app.user("/ai",aiRouter)
+// app.user("/ai",aiRouter)
 const initailizeConnection = async () => {
   try {
     await Promise.all([ main(), redisClient.connect()]);

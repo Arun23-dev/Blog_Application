@@ -1,7 +1,13 @@
-const mongoose=require('mongoose');
-// console.log(process.env.DB_CONNECT_KEY);
+const mongoose = require('mongoose');
+
 async function main() {
-   await mongoose.connect(process.env.DB_CONNECT_KEY)
-    
+  try {
+    const conn = await mongoose.connect(process.env.DB_CONNECT_KEY);
+    console.log('✅ MongoDB Connected to Blog database');
+  } catch (err) {
+    console.error('❌ Connection failed:', err.message);
+    process.exit(1);
+  }
 }
-module.exports=main;
+
+module.exports = main;

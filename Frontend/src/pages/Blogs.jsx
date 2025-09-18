@@ -12,7 +12,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Search from "../components/Search";
-import AIContentSuggestions from "../components/AIContentSuggestions";
+import AIContentSuggestions from "../components/AI/AIContentSuggestions";
+
 
 const categories = [
   {

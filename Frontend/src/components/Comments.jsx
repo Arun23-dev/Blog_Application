@@ -9,15 +9,7 @@ function Comments() {
                 <textarea name="" id="" placeholder='write a comments here' className='bg-amber-50 w-full rounded-2xl pl-3 pt-3' />
                 <button className='bg-blue-800 border-1 px-3  py-1 rounded-2xl'>Send</button>
             </div>
-            <SingleComment />
-            <SingleComment />
-            <SingleComment />
-            <SingleComment />
-            <SingleComment />
-            <SingleComment />
-            <SingleComment />
-            <SingleComment />
-
+           
         </div>
     )
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, BookOpen, TrendingUp, Clock, Heart, ArrowRight } from 'lucide-react';
-import axiosClient from '../../utils/axiosClient';
+import axiosClient from '../../../utils/axiosClient';
 
 const AIContentSuggestions = ({ category, limit = 5, title = "AI Recommendations" }) => {
   const [suggestions, setSuggestions] = useState([]);

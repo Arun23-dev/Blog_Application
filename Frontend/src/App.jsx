@@ -1,5 +1,3 @@
-
-
 // layout
 import AdminLayout from "./layout/AdminLayout"
 import UserLayout from "./layout/UserLayout"
@@ -10,18 +8,17 @@ import { Routes, Route } from "react-router";
 
 // pages
 import Home from "./pages/Home";
-// import Blogs from "./pages/Blogs";
 import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
+import SignUp from "./pages/Signup";
 import Recent from "./pages/Recent";
 import About from "./pages/About";
 
-// admin pages
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UsersManagement from "./pages/admin/UsersManagement";
 import Analytics from "./pages/admin/Analytics";
 import Auth0Management from "./pages/admin/Auth0Management";
 import RateLimitManagement from "./pages/admin/RateLimitManagement";
+
 import AdminBlog from "./pages/admin/AdminBlog";
 import Blogs from "./pages/Blogs";
 // import Blog from "./pages/Blog";
@@ -31,6 +28,7 @@ import AdminRoute from "./routes/AdminRoute";
 
 // import AuthProvider from "./components/AuthProvider";
 
+
 export default function App() {
   const imagekiturl = import.meta.env.VITE_IMAGEKIT_URL
   return (
@@ -39,7 +37,6 @@ export default function App() {
           <Route element={<PublicLayout />}>
             <Route path='/' element={<Home />} />
             <Route path='home' element={<Home />} />
-            {/* <Route path="blog" element={<Blogs />} /> */}
             <Route path="recent" element={<Recent />} />
             <Route path="about" element={<About />} />
             <Route path="login" element={<Login />} />
@@ -52,12 +49,8 @@ export default function App() {
 
 
           </Route>
-          
-          {/* Protected Admin Routes */}
-          {/* <Route element={<AdminRoute />}> */}
+  
             <Route path="admin" element={<AdminLayout />}>
-              {/* <Route index element={<AdminDashboard />} /> */}
-            <Route path="/admin/blog" element={<AdminBlog />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<UsersManagement />} />
               <Route path="posts" element={<div>Posts Management</div>} />
@@ -67,7 +60,7 @@ export default function App() {
               <Route path="rate-limits" element={<RateLimitManagement />} />
               <Route path="settings" element={<div>Settings</div>} />
             </Route>
-          {/* </Route> */}
+         
         </Routes>
       </ImageKitProvider>
   );

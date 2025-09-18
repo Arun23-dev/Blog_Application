@@ -3,37 +3,80 @@ const validate = require("../utils/validate");
 const redisClient = require("../config/redis");
 
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const user = require("../models/user");
+const jwt = require("jsonwebtoken")
 
 const register = async (req, res) => {
-  try {
-    
-    validate(req.body); //function call for the validation
+    try {
+        validate(req.body); // function call for the validation
+        
+        // Destructuring should be after validation
+        const { firstName, emailId, password } = req.body;
+        
+        const registerData = {
+            firstName: firstName,
+            emailId: emailId,
+            password: password,
+        }
 
-    const { firstName, emailId, password } = req.body; //destructuring of the object
-    const saltRounds = 5;
+        const saltRounds = 5; // Increased from 5 to 10 for better security
+        
+        // Hash the password before saving
+        registerData.password = await bcrypt.hash(password, saltRounds);
+        
+        // Check if user already exists to prevent duplicate error
+        const existingUser = await User.findOne({ emailId });
+        if (existingUser) {
+            return res.status(400).json({
+                message: "User already exists with this email",
+                error: "DUPLICATE_EMAIL"
+            });
+        }
+        
+        const newuser = await User.create(registerData);
 
-    req.body.password = await bcrypt.hash(password, saltRounds);
+        const token = jwt.sign(
+            {
+                _id: newuser._id,
+                emailId: emailId,
+                role: 'user'
+            },
+            process.env.JWT_KEY,
+            { expiresIn: 60 * 60 }
+        );
+        
+        const reply = {
+            firstName: newuser.firstName,
+            emailId: newuser.emailId,
+            _id: newuser._id,
+            role: newuser.role || 'user' // Added fallback in case role is not defined
+        }
 
-    const newuser = await User.create(req.body);
-
-    const token = jwt.sign(
-      { _id: newuser._id, emailId: emailId, role: "user" },
-      process.env.JWT_KEY,
-      { expiresIn: 60 * 60 }
-    );
-
-    res.cookie("token", token, { maxAge: 60 * 60 * 10000 });
-
-    return res.status(201).send("User registered successfully");
-  } catch (err) {
-    res.status(400).json({
-      message: "User registration failed",
-      error: err.message || "Unknown error occurred",
-    });
-  }
-};
+        res.cookie('token', token, { 
+            maxAge: 60 * 60 * 1000,
+            httpOnly: true // Added for security
+        });
+        
+        return res.status(201).json({
+            user: reply,
+            message: "User registered successfully"
+        });
+    }
+    catch(err) {
+        // Handle duplicate key error specifically
+        if (err.code === 11000) {
+            return res.status(400).json({
+                message: "User already exists with this email",
+                error: "DUPLICATE_EMAIL"
+            });
+        }
+        
+        console.error("Registration error:", err);
+        res.status(400).json({
+            message: "User registration failed",
+            error: err.message || "Unknown error occurred"
+        });
+    }
+}
 
 const login = async (req, res) => {
   try {

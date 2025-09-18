@@ -1,6 +1,6 @@
-/* ✅ Imports must come first */
+
 @import "tailwindcss";
-/* then you can add your custom stuff */
+
 @custom-variant dark (&:is(.dark *));
 
 /* ligth variables  */
@@ -66,7 +66,6 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
-/* Theme mappings */
 @theme inline {
   --font-sans: var(--font-open-sans);
   --font-heading: var(--font-montserrat);
@@ -109,11 +108,9 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-sans);
-  }
+
   .font-heading {
     font-family: var(--font-heading);
   }
-} */
+}
+
